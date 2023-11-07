@@ -1,0 +1,46 @@
+# まずは下記コマンドを実行。それからcompose upする。
+# docker network create --driver bridge shared
+# docker compose up
+
+# コンテナ立ち上げたらそこに入ってNginxの設定を変える。こうしないと大きい画像アップできない
+# docker exec -it nginx-proxy bash
+# apt update
+# apt install vim
+# vim /etc/nginx/nginx.conf
+# httpに client_max_body_size 500M; を追加。容量は任意。
+# composeを停止(Ctrl+C もしくは docker compose down)
+# docker compose up
+
+version: "2"
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+    restart: always
+    networks:
+      - shared
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/etc/nginx/certs:rw
+    volumes_from:
+      - nginx-proxy
+    restart: always
+    networks:
+      - shared
+
+networks:
+  shared:
+    external: true
