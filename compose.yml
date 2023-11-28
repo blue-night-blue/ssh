@@ -1,7 +1,15 @@
-# コンテナ立ち上げ前に下記コマンドを実行。
+# このcomposeを立ち上げる前に下記コマンドを実行。
 # docker network create --driver bridge shared
 
-version: "2"
+# このcomposeを立ち上げた後、
+# docker exec -it nginx-proxy bash
+# でコンテナに入り込み、root/etc/nginx/nginx.confを開き、
+# 下記をコメントアウト解除してhttp内に貼り付ける。
+# （大量に画像アップできるようにするため）
+# client_max_body_size 500M;
+# proxy_connect_timeout 60s;
+# proxy_send_timeout 60s;
+# proxy_read_timeout 60s;
 
 services:
   nginx-proxy:
@@ -15,7 +23,6 @@ services:
       - ./certs:/etc/nginx/certs:ro
       - /etc/nginx/vhost.d
       - /usr/share/nginx/html
-      - ./custom.conf:/etc/nginx/conf.d/custom.conf:ro
     restart: always
     networks:
       - shared
