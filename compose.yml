@@ -24,6 +24,7 @@ services:
       - ./certs:/etc/nginx/certs:ro
       - ./vhost:/etc/nginx/vhost.d
       - ./html:/usr/share/nginx/html
+      - ./custom.conf:/etc/nginx/conf.d/custom.conf:ro
     restart: always
     networks:
       - shared
